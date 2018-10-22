@@ -1,11 +1,154 @@
 import java.math.BigInteger;
 import java.util.Scanner;
+
+import java.util.*;
+
+class ReversePolishNotation{
+
+    public static List<String> postfix;
+    public static boolean successfulParse = true;
+    public static boolean successfulCalculate = true;
+    private static int checkOperator(String str){
+        int result = -1;
+        if (str.equals("+")) result = 0;
+        else if (str.equals("-")) result = 1;
+        else if (str.equals("*")) result = 2;
+        else if (str.equals("/")) result = 3;
+        else if (str.equals("minus")) result = 4;
+        return result;
+    }
+
+    private static boolean checkNumber(String str)throws NumberFormatException {
+        try {
+            BigInteger big = new BigInteger(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private static boolean checkBracket(String str){
+        return (str.equals("(") || str.equals(")"));
+    }
+
+    private static int getOperatorPriority(String str){
+        int result = 4;
+        if (str.equals("(")) result = 1;
+        else if (str.equals("+")) result = 2;
+        else if (str.equals("-")) result = 2;
+        else if (str.equals("*")) result = 3;
+        else if (str.equals("/")) result = 3;
+        return result;
+    }
+
+    public static List<String> parseExpression(String infix){
+        successfulParse = true;
+        postfix = new ArrayList<String>();
+        Stack<String> stack = new Stack<String>();
+        StringTokenizer tokenizer = new StringTokenizer(infix, "( )", true);
+        String current = "", previous = "";
+        while (tokenizer.hasMoreTokens()) {
+            current = tokenizer.nextToken();
+            if (!tokenizer.hasMoreTokens() && (checkOperator(current) != -1)) {
+                System.out.println("Некорректное выражение.");
+                successfulParse = false;
+                return postfix;
+            }
+            if (current.equals(" ")) continue;
+            if (checkBracket(current)) {
+                if (current.equals("(")) stack.push(current);
+                else if (current.equals(")")) {
+                    while (!stack.peek().equals("(")) {
+                        postfix.add(stack.pop());
+                        if (stack.isEmpty()) {
+                            System.out.println("Скобки не согласованы.");
+                            successfulParse = false;
+                            return postfix;
+                        }
+                    }
+                    stack.pop();
+                }
+            }
+            else if (checkOperator(current) != -1){
+                if (current.equals("-") && (previous.equals("") || (checkBracket(previous)  && !previous.equals(")")))) {
+                    // унарный минус
+                    current = "minus";
+                }
+                else {
+                    while (!stack.isEmpty() && (getOperatorPriority(current) <= getOperatorPriority(stack.peek()))) {
+                        postfix.add(stack.pop());
+                    }
+                }
+                stack.push(current);
+            }
+            else {
+                postfix.add(current);
+            }
+            previous = current;
+        }
+
+        while(!stack.isEmpty()){
+            if(checkOperator(stack.peek()) != -1){
+                postfix.add(stack.pop());
+            }
+            else{
+                successfulParse = false;
+                return postfix;
+            }
+        }
+        return postfix;
+    }
+
+    public static BigInteger calculateExpression(){
+        successfulCalculate = true;
+        Stack<BigInteger> stack = new Stack<BigInteger>();
+        BigInteger operand1, operand2;
+        for(String x: postfix){
+            switch(checkOperator(x)) {
+                case -1:
+                    operand1 = new BigInteger(x);
+                    stack.push(operand1);
+                    break;
+                case 0:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop();
+                    stack.push(operand1.add(operand2));
+                    break;
+                case 1:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop();
+                    stack.push(operand1.subtract(operand2));
+                    break;
+                case 2:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop();
+                    stack.push(operand1.multiply(operand2));
+                    break;
+                case 3:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop();
+                    if (operand2.equals(BigInteger.ZERO)) {
+                        successfulCalculate = false;
+                        return BigInteger.valueOf(Long.MAX_VALUE);
+                    }
+                    stack.push(operand1.divide(operand2));
+                    break;
+                case 4:
+                    stack.push(stack.pop().negate());
+                    break;
+            }
+        }
+        return stack.pop();
+    }
+}
+
 class Calculator{
-    public static void main(String[] arg){
+    public static void main(String[] args) {
+        // write your code here
         System.out.println("Hello, User!");
-        System.out.print("Enter your string you want to calculate (if you have some questions, enter 'help'):\n");
+        System.out.print("Enter your expression you want to calculate (if you have some questions, enter 'help'):\n");
         Scanner in;
-        String inputString;
+        String inputString, resultString;
         while(true){
             in = new Scanner(System.in);
             inputString = in.nextLine();
@@ -13,77 +156,34 @@ class Calculator{
                 System.out.println("Nothing to calculate, I'm out!");
                 break;
             }
-            String subStr[] = inputString.split(" ");
-            if (subStr[0].equals("help")) {
+            else if (inputString.equals("help")){
                 System.out.print("This program calculates the expression entered by the user in the format: " +
-                        "\"operand1 operator operand2\"\nThere must be spaces between operators and operands!"+
+                        "\"operand1 operator operand2\"\nThere must be spaces between operators and operands!\n"+
+                        "Examples of expressions:\n1 + 2 * 3 - 5\n5 * (1 + 3)\n"+
+                        "This program works with INTEGER numbers of any length you want!" +
                         "\nTo stop this program, enter nothing and press enter button\n");
                 continue;
             }
-            if(subStr.length < 3){
+            ReversePolishNotation rpn = new ReversePolishNotation();
+            rpn.parseExpression(inputString);
+
+            if(rpn.successfulParse){
+                System.out.print("Reverse Polish Notation: ");
+                for (String x : rpn.postfix) System.out.print(x + " ");
+                System.out.print("\nResult = ");
+                BigInteger result = rpn.calculateExpression();
+                if (rpn.successfulCalculate){
+                    System.out.println(result.toString());
+                }
+                else{
+                    System.out.println("not defined (Fail calculating)");
+                }
+            }
+            else{
                 System.out.println("Syntax error!");
-                continue;
             }
-            BigInteger firstOperand, secondOperand, result = BigInteger.valueOf(0);
-            if (checkNumber(subStr[0])) {
-                firstOperand = new BigInteger(subStr[0]);
-            }
-            else {
-                System.out.println("Syntax error!");
-                continue;
-            }
-            if (checkNumber(subStr[2])) {
-                secondOperand = new BigInteger(subStr[2]);
-            }
-            else {
-                System.out.println("Syntax error!");
-                continue;
-            }
-            String resultString = "";
-            int operator = checkOperator(subStr[1]);
-            switch (operator) {
-                case 0:
-                    result = firstOperand.add(secondOperand);
-                    break;
-                case 1:
-                    result = firstOperand.subtract(secondOperand);
-                    break;
-                case 2:
-                    result = firstOperand.multiply(secondOperand);
-                    break;
-                case 3:
-                    if (!secondOperand.equals(BigInteger.ZERO))
-                        result = firstOperand.divide(secondOperand);
-                    else
-                        resultString = "infinity";
-                    break;
-                default:  resultString = "not defined (unknown operator)";
-            }
-            if (resultString.equals("")) {
-                resultString = result.toString();
-            }
-            System.out.printf("Result = %s\n", resultString);
         }
         return;
-    }
-
-    public static int checkOperator(String str){
-        int result = -1;
-        if (str.equals("+")) result = 0;
-        else if (str.equals("-")) result = 1;
-        else if (str.equals("*")) result = 2;
-        else if (str.equals("/")) result = 3;
-        return result;
-    }
-
-    public static boolean checkNumber(String str)throws NumberFormatException {
-        try {
-            BigInteger big = new BigInteger(str);
-            return true;
-        } 
-        catch (NumberFormatException e) {
-            return false;
-        }
     }
     
 }
