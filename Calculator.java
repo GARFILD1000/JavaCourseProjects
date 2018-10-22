@@ -50,7 +50,6 @@ class ReversePolishNotation{
         while (tokenizer.hasMoreTokens()) {
             current = tokenizer.nextToken();
             if (!tokenizer.hasMoreTokens() && (checkOperator(current) != -1)) {
-                System.out.println("Некорректное выражение.");
                 successfulParse = false;
                 return postfix;
             }
@@ -61,7 +60,6 @@ class ReversePolishNotation{
                     while (!stack.peek().equals("(")) {
                         postfix.add(stack.pop());
                         if (stack.isEmpty()) {
-                            System.out.println("Скобки не согласованы.");
                             successfulParse = false;
                             return postfix;
                         }
@@ -71,7 +69,6 @@ class ReversePolishNotation{
             }
             else if (checkOperator(current) != -1){
                 if (current.equals("-") && (previous.equals("") || (checkBracket(previous)  && !previous.equals(")")))) {
-                    // унарный минус
                     current = "minus";
                 }
                 else {
@@ -81,12 +78,15 @@ class ReversePolishNotation{
                 }
                 stack.push(current);
             }
-            else {
+            else if(checkNumber(current)){
                 postfix.add(current);
+            }
+            else{
+                successfulParse = false;
+                return postfix;
             }
             previous = current;
         }
-
         while(!stack.isEmpty()){
             if(checkOperator(stack.peek()) != -1){
                 postfix.add(stack.pop());
@@ -144,7 +144,6 @@ class ReversePolishNotation{
 
 class Calculator{
     public static void main(String[] args) {
-        // write your code here
         System.out.println("Hello, User!");
         System.out.print("Enter your expression you want to calculate (if you have some questions, enter 'help'):\n");
         Scanner in;
@@ -185,5 +184,4 @@ class Calculator{
         }
         return;
     }
-    
 }
