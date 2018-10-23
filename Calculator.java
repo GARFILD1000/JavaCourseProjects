@@ -15,6 +15,8 @@ class ReversePolishNotation{
         else if (str.equals("*")) result = 2;
         else if (str.equals("/")) result = 3;
         else if (str.equals("minus")) result = 4;
+        else if (str.equals("^")) result = 5;
+        else if (str.equals("mod")) result = 6;
         return result;
     }
 
@@ -68,7 +70,7 @@ class ReversePolishNotation{
                 }
             }
             else if (checkOperator(current) != -1){
-                if (current.equals("-") && (previous.equals("") || (checkBracket(previous)  && !previous.equals(")")))) {
+                if (current.equals("-") && ((checkOperator(previous) != -1) || (checkBracket(previous)  && !previous.equals(")")))) {
                     current = "minus";
                 }
                 else {
@@ -79,7 +81,13 @@ class ReversePolishNotation{
                 stack.push(current);
             }
             else if(checkNumber(current)){
-                postfix.add(current);
+                if (checkNumber(previous)){
+                    successfulParse = false;
+                    return postfix;
+                }
+                else{
+                    postfix.add(current);
+                }
             }
             else{
                 successfulParse = false;
@@ -100,6 +108,7 @@ class ReversePolishNotation{
     }
 
     public static BigInteger calculateExpression(){
+        if (successfulParse == false) return BigInteger.valueOf(0);
         successfulCalculate = true;
         Stack<BigInteger> stack = new Stack<BigInteger>();
         BigInteger operand1, operand2;
@@ -136,6 +145,16 @@ class ReversePolishNotation{
                 case 4:
                     stack.push(stack.pop().negate());
                     break;
+                case 5:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop();
+                    stack.push(operand1.pow(operand2.intValue()));
+                    break;
+                case 6:
+                    operand2 = stack.pop();
+                    operand1 = stack.pop(); 
+                    stack.push(operand1.mod(operand2));
+                    break;
             }
         }
         return stack.pop();
@@ -165,7 +184,7 @@ class Calculator{
             }
             ReversePolishNotation rpn = new ReversePolishNotation();
             rpn.parseExpression(inputString);
-
+           
             if(rpn.successfulParse){
                 System.out.print("Reverse Polish Notation: ");
                 for (String x : rpn.postfix) System.out.print(x + " ");
