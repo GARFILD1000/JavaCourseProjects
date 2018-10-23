@@ -1,3 +1,7 @@
+
+
+import java.math.MathContext;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Scanner;
 
@@ -21,7 +25,7 @@ class ReversePolishNotation{
 
     private static boolean checkNumber(String str)throws NumberFormatException {
         try {
-            BigInteger big = new BigInteger(str);
+            BigDecimal big = new BigDecimal(str);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -111,15 +115,15 @@ class ReversePolishNotation{
         return postfix;
     }
 
-    public static BigInteger calculateExpression(){
-        if (successfulParse == false) return BigInteger.valueOf(0);
+    public static BigDecimal calculateExpression(){
+        if (successfulParse == false) return BigDecimal.valueOf(0);
         successfulCalculate = true;
-        Stack<BigInteger> stack = new Stack<BigInteger>();
-        BigInteger operand1, operand2;
+        Stack<BigDecimal> stack = new Stack<BigDecimal>();
+        BigDecimal operand1, operand2;
         for(String x: postfix){
             switch(checkOperator(x)) {
                 case -1:
-                    operand1 = new BigInteger(x);
+                    operand1 = new BigDecimal(x);
                     stack.push(operand1);
                     break;
                 case 0:
@@ -140,9 +144,9 @@ class ReversePolishNotation{
                 case 3:
                     operand2 = stack.pop();
                     operand1 = stack.pop();
-                    if (operand2.equals(BigInteger.ZERO)) {
+                    if (operand2.equals(BigDecimal.ZERO)) {
                         successfulCalculate = false;
-                        return BigInteger.valueOf(Long.MAX_VALUE);
+                        return BigDecimal.valueOf(Long.MAX_VALUE);
                     }
                     stack.push(operand1.divide(operand2));
                     break;
@@ -152,12 +156,19 @@ class ReversePolishNotation{
                 case 5:
                     operand2 = stack.pop();
                     operand1 = stack.pop();
-                    stack.push(operand1.pow(operand2.intValue()));
+                    if (operand2.compareTo(BigDecimal.ZERO) >= 0){
+                        stack.push(operand1.pow(operand2.intValue()));
+                    }
+                    else{
+                        stack.push(BigDecimal.ONE.divide(operand1.pow(operand2.abs().intValue())));
+                    } 
+                   
                     break;
                 case 6:
                     operand2 = stack.pop();
-                    operand1 = stack.pop(); 
-                    stack.push(operand1.mod(operand2));
+                    operand1 = stack.pop();
+                    operand1 = new BigDecimal((operand1.toBigInteger().mod(operand2.toBigInteger())).toString()); 
+                    stack.push(operand1);
                     break;
             }
         }
@@ -193,7 +204,7 @@ class Calculator{
                 System.out.print("Reverse Polish Notation: ");
                 for (String x : rpn.postfix) System.out.print(x + " ");
                 System.out.print("\nResult = ");
-                BigInteger result = rpn.calculateExpression();
+                BigDecimal result = rpn.calculateExpression();
                 if (rpn.successfulCalculate){
                     System.out.println(result.toString());
                 }
