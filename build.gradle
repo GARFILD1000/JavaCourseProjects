@@ -1,0 +1,9 @@
+apply plugin:"java"
+apply plugin:"application"
+mainClassName="com.example.Calculator"
+task wrapper(type:Wrapper){
+    gradleVersion="4.10.2"
+}
+run{
+     standardInput = System.in
+}

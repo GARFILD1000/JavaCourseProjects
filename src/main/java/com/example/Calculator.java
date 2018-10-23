@@ -1,5 +1,4 @@
-
-
+package com.example;
 import java.math.MathContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -7,11 +6,13 @@ import java.util.Scanner;
 
 import java.util.*;
 
-class ReversePolishNotation{
-    public static List<String> postfix;
-    public static boolean successfulParse = true;
-    public static boolean successfulCalculate = true;
-    private static int checkOperator(String str){
+
+class Calculator{
+private static class ReversePolishNotation{
+    public List<String> postfix;
+    public boolean successfulParse = true;
+    public boolean successfulCalculate = true;
+    private int checkOperator(String str){
         int result = -1;
         if (str.equals("+")) result = 0;
         else if (str.equals("-")) result = 1;
@@ -23,7 +24,7 @@ class ReversePolishNotation{
         return result;
     }
 
-    private static boolean checkNumber(String str)throws NumberFormatException {
+    private boolean checkNumber(String str)throws NumberFormatException {
         try {
             BigDecimal big = new BigDecimal(str);
             return true;
@@ -32,11 +33,11 @@ class ReversePolishNotation{
         }
     }
 
-    private static boolean checkBracket(String str){
+    private boolean checkBracket(String str){
         return (str.equals("(") || str.equals(")"));
     }
 
-    private static int getOperatorPriority(String str){
+    private int getOperatorPriority(String str){
         int result = 4;
         switch(checkOperator(str)){
             case 0: result = 2; break;
@@ -51,7 +52,7 @@ class ReversePolishNotation{
         return result;
     }
 
-    public static List<String> parseExpression(String infix){
+    public List<String> parseExpression(String infix){
         successfulParse = true;
         postfix = new ArrayList<String>();
         Stack<String> stack = new Stack<String>();
@@ -115,7 +116,7 @@ class ReversePolishNotation{
         return postfix;
     }
 
-    public static BigDecimal calculateExpression(){
+    public BigDecimal calculateExpression(){
         if (successfulParse == false) return BigDecimal.valueOf(0);
         successfulCalculate = true;
         Stack<BigDecimal> stack = new Stack<BigDecimal>();
@@ -174,8 +175,6 @@ class ReversePolishNotation{
         return stack.pop();
     }
 }
-
-class Calculator{
     public static void main(String[] args) {
         System.out.println("Hello, User!");
         System.out.print("Enter your expression you want to calculate (if you have some questions, enter 'help'):\n");
