@@ -162,7 +162,6 @@ class ReversePolishNotation{
                     else{
                         stack.push(BigDecimal.ONE.divide(operand1.pow(operand2.abs().intValue())));
                     } 
-                   
                     break;
                 case 6:
                     operand2 = stack.pop();
@@ -193,7 +192,7 @@ class Calculator{
                 System.out.print("This program calculates the expression entered by the user in the format: " +
                         "\"operand1 operator operand2\"\nThere must be spaces between operators and operands!\n"+
                         "Examples of expressions:\n1 + 2 * 3 - 5\n5 * (1 + 3)\n"+
-                        "This program works with INTEGER numbers of any length you want!" +
+                        "This program works with REAL numbers of any length you want!" +
                         "\nTo stop this program, enter nothing and press enter button\n");
                 continue;
             }
