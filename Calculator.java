@@ -4,7 +4,6 @@ import java.util.Scanner;
 import java.util.*;
 
 class ReversePolishNotation{
-
     public static List<String> postfix;
     public static boolean successfulParse = true;
     public static boolean successfulCalculate = true;
@@ -35,11 +34,16 @@ class ReversePolishNotation{
 
     private static int getOperatorPriority(String str){
         int result = 4;
+        switch(checkOperator(str)){
+            case 0: result = 2; break;
+            case 1: result = 2; break;
+            case 2: result = 3; break;
+            case 3: result = 3; break;
+            case 4: result = 5; break;
+            case 5: result = 4; break;
+            case 6: result = 3; break;
+        }
         if (str.equals("(")) result = 1;
-        else if (str.equals("+")) result = 2;
-        else if (str.equals("-")) result = 2;
-        else if (str.equals("*")) result = 3;
-        else if (str.equals("/")) result = 3;
         return result;
     }
 
