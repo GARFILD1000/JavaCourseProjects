@@ -16,6 +16,7 @@ class PhoneBook{
             if (mainCycle(list) <= 0) break;
         }
     }
+
     public static int mainCycle(LinkedList<LegalPerson> list){
         try{
             clearConsole();
@@ -27,8 +28,8 @@ class PhoneBook{
         System.out.println("1. Show all users\n2. Add new user\n3. Delete any user\n0. Exit program");
         System.out.print("Enter menu item number: ");
         Scanner input = new Scanner(System.in);
-        int buffer = input.nextInt();
-        switch(buffer){
+        String buffer = input.nextLine();
+        switch(Integer.parseInt(buffer)){
         case 1: 
             System.out.println("Legal Persons:");
             for(LegalPerson x: list){
@@ -37,7 +38,7 @@ class PhoneBook{
         break; 
         case 2:
             System.out.print("Status of person (Legal/Physical): ");
-            buffer = input.nextInt();
+            buffer = input.nextLine();
             
             
         break;
