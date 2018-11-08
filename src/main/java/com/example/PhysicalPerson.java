@@ -6,6 +6,8 @@ class PhysicalPerson extends User{
     PhysicalPerson(String fio, String phone, String address, String mobilePhone){
         super(fio, phone, address);
         this.mobilePhone = mobilePhone;
+        this.ID = index;
+        index++;
     }
     public String getMobilePhone(){
         return this.mobilePhone;
@@ -14,3 +16,4 @@ class PhysicalPerson extends User{
         this.mobilePhone = newMobilePhone;
     }
 }
+

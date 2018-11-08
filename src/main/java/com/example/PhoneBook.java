@@ -201,12 +201,12 @@ class PhoneBook{
     } 
     
     private static void printPerson(LegalPerson person){
-        System.out.println("Name: " + person.getFio() + "\nPhone: " + person.getPhone() + "\nAddress: " + person.getAddress() + "\nINN: " +
+        System.out.println("ID: " + person.getID() + "\nName: " + person.getFio() + "\nPhone: " + person.getPhone() + "\nAddress: " + person.getAddress() + "\nINN: " +
                 person.getINN());
     }
     
     private static void printPerson(PhysicalPerson person){
-        System.out.println("Name: " + person.getFio() + "\nPhone: " + person.getPhone() + "\nAddress: " + person.getAddress() + 
+        System.out.println("ID: " + person.getID() + "\nName: " + person.getFio() + "\nPhone: " + person.getPhone() + "\nAddress: " + person.getAddress() + 
             "\nMobileNumber: " + person.getMobilePhone());
     }
     

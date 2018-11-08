@@ -6,6 +6,8 @@ class LegalPerson extends User{
     LegalPerson(String fio, String phone, String address, String INN){
         super(fio, phone, address);
         this.INN = INN;
+        this.ID = index;
+        index++;
     }
     public String getINN(){
         return this.INN;

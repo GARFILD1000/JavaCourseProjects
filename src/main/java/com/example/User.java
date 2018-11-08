@@ -6,10 +6,16 @@ abstract class User{
         this.phone = newPhone;
         this.address = newAddress;
     }
+    protected int ID; 
     protected String fio;
     protected String phone;
     protected String address;
 
+
+    public int getID(){
+        return this.ID;
+    }
+    
     public String getFio(){
         return this.fio;
     }
