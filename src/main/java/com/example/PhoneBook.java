@@ -1,19 +1,20 @@
 package com.example;
 import java.util.*;
 import java.io.IOException;
-
+import java.io.FileReader;
 //import PhysicalPerson;
 //import LegalPerson;
 
 class PhoneBook{
     static Scanner input;
     
-    static class LegalPersonComparator implements Comparator<LegalPerson> {
+    static class LegalPersonComparator implements Comparator<LegalPerson>{
         public int compare(LegalPerson paramT1, LegalPerson paramT2) {
-            if (paramT1.getFio().compareTo(paramT2.getFio()) > 0)
-                return -1;
-            else if (paramT1.getFio().compareTo(paramT2.getFio()) < 0)
+            if (paramT1.getID() > paramT2.getID()){
                 return 1;
+            }
+            else if (paramT1.getID() < paramT2.getID())
+                return -1;
             else
                 return 0;
         }
@@ -21,15 +22,16 @@ class PhoneBook{
     
     static class PhysicalPersonComparator implements Comparator<PhysicalPerson> {
         public int compare(PhysicalPerson paramT1, PhysicalPerson paramT2) {
-            if (paramT1.getFio().compareTo(paramT2.getFio()) > 0)
-                return -1;
-            else if (paramT1.getFio().compareTo(paramT2.getFio()) < 0)
+            if (paramT1.getID() > paramT2.getID()){
                 return 1;
+            }
+            else if (paramT1.getID() < paramT2.getID())
+                return -1;
             else
                 return 0;
         }
     }
-
+    
     public static void main(String[] args){
         input = new Scanner(System.in);
         TreeSet<LegalPerson> legalPersonTree = new TreeSet<LegalPerson>(new LegalPersonComparator()); 
@@ -41,6 +43,28 @@ class PhoneBook{
         }
     }
 
+    
+    public static <E> String readDatabase(String fileName){
+        clearConsole();
+        FileReader fr;
+        StringBuffer stringBuffer = new StringBuffer("");
+        try{
+            fr = new FileReader(fileName);
+            char[] buffer = new char[3];
+            int result = fr.read(buffer, 0, 3);
+            while(result > 0){
+                stringBuffer = stringBuffer.append(String.valueOf(buffer));
+                result = fr.read(buffer, 0, 3);
+            }
+            System.out.println("Readed from " + fileName + "\n" + stringBuffer);
+            fr.close();
+        }
+        catch(IOException error){
+            String exception = error.getMessage();
+            System.out.println("Error reading from" + fileName + "\n" + exception);
+        };
+        return stringBuffer.toString();
+    }
 
     public static void printAllPersons(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
         clearConsole();
@@ -79,6 +103,7 @@ class PhoneBook{
             }
             if(legalPersonTree.remove(new LegalPerson(FIO,"","",""))){
                 System.out.print("Successfully deleted!");
+                LegalPerson.remove();
             }
             else{
                 System.out.print("There is no person with same FIO in PhoneBook!");
@@ -94,6 +119,7 @@ class PhoneBook{
             }
             if(physicalPersonTree.remove(new PhysicalPerson(FIO,"","",""))){
                 System.out.print("Successfully deleted!");
+                PhysicalPerson.remove();
             }
             else{
                 System.out.print("There is no person with same FIO in PhoneBook!");
@@ -179,7 +205,7 @@ class PhoneBook{
     public static int mainCycle(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
         clearConsole();
         System.out.println("<><><> Phone Book Menu <><><>");
-        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n0. Exit program");
+        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n0. Exit program");
         System.out.print("Enter menu item number: ");
         String buffer = input.nextLine();
         switch(Integer.parseInt(buffer)){
@@ -191,6 +217,30 @@ class PhoneBook{
         break;
         case 3:   
             deleteAnyPerson(legalPersonTree, physicalPersonTree);
+        break;
+        case 4:
+            String stringFromDatabase = readDatabase("LegalPersons.csv");
+            String[] lines = stringFromDatabase.split("\n");
+            LegalPerson.clear();
+            legalPersonTree.clear();
+            for(String x: lines){
+                LegalPerson newLegalPerson = new LegalPerson("","","","");
+                newLegalPerson.fromCSV(x);
+                legalPersonTree.add(newLegalPerson);
+            }
+            
+            stringFromDatabase = readDatabase("PhysicalPersons.csv");
+            lines = stringFromDatabase.split("\n");
+            PhysicalPerson.clear();
+            physicalPersonTree.clear();
+            for(String x: lines){
+                PhysicalPerson newPhysicalPerson = new PhysicalPerson("","","","");
+                newPhysicalPerson.fromCSV(x);
+                physicalPersonTree.add(newPhysicalPerson);
+            }
+            
+            input.nextLine();
+            
         break;
         case 0:
             return 0;

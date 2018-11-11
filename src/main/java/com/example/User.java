@@ -1,6 +1,11 @@
 package com.example;
 
-abstract class User{
+interface CSV{
+    String toCSV();
+    int fromCSV(String str);
+}
+
+abstract class User implements CSV{
     protected User(String newFio, String newPhone, String newAddress){
         this.fio = newFio;
         this.phone = newPhone;
@@ -36,5 +41,25 @@ abstract class User{
     public void setAddress(String newAddress){
         this.address = newAddress;
     }
+    
+    public String toCSV(){
+        return (ID + ";" + fio + ";" + phone + ";" + address);
+    };
+    public int fromCSV(String str){
+        String[] array = str.split(";");
+        if (array.length >= 4){
+            
+            this.ID = Integer.valueOf(array[0]);
+            this.fio = array[1];
+            this.phone = array[2];
+            this.address = array[3];
+        }
+        else {
+            System.out.println("Error here!");
+            return 1;
+        }
+        return 0;
+    }
+    
 }
 
