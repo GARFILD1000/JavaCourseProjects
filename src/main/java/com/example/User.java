@@ -16,7 +16,6 @@ abstract class User implements CSV{
     protected String phone;
     protected String address;
 
-
     public int getID(){
         return this.ID;
     }

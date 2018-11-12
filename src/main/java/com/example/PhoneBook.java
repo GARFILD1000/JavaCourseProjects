@@ -202,6 +202,29 @@ class PhoneBook{
         return 0;
     }
 
+    public static void readAllDatabases(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+        String stringFromDatabase = readDatabase("LegalPersons.csv");
+        String[] lines = stringFromDatabase.split("\n");
+        LegalPerson.clear();
+        legalPersonTree.clear();
+        for(String x: lines){
+            LegalPerson newLegalPerson = new LegalPerson("","","","");
+            newLegalPerson.fromCSV(x);
+            legalPersonTree.add(newLegalPerson);
+        }
+        stringFromDatabase = readDatabase("PhysicalPersons.csv");
+        lines = stringFromDatabase.split("\n");
+        PhysicalPerson.clear();
+        physicalPersonTree.clear();
+        for(String x: lines){
+            PhysicalPerson newPhysicalPerson = new PhysicalPerson("","","","");
+            newPhysicalPerson.fromCSV(x);
+            physicalPersonTree.add(newPhysicalPerson);
+        }
+        input.nextLine();
+        return;
+    }
+
     public static int mainCycle(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
         clearConsole();
         System.out.println("<><><> Phone Book Menu <><><>");
@@ -219,28 +242,7 @@ class PhoneBook{
             deleteAnyPerson(legalPersonTree, physicalPersonTree);
         break;
         case 4:
-            String stringFromDatabase = readDatabase("LegalPersons.csv");
-            String[] lines = stringFromDatabase.split("\n");
-            LegalPerson.clear();
-            legalPersonTree.clear();
-            for(String x: lines){
-                LegalPerson newLegalPerson = new LegalPerson("","","","");
-                newLegalPerson.fromCSV(x);
-                legalPersonTree.add(newLegalPerson);
-            }
-            
-            stringFromDatabase = readDatabase("PhysicalPersons.csv");
-            lines = stringFromDatabase.split("\n");
-            PhysicalPerson.clear();
-            physicalPersonTree.clear();
-            for(String x: lines){
-                PhysicalPerson newPhysicalPerson = new PhysicalPerson("","","","");
-                newPhysicalPerson.fromCSV(x);
-                physicalPersonTree.add(newPhysicalPerson);
-            }
-            
-            input.nextLine();
-            
+            readAllDatabases(legalPersonTree, physicalPersonTree);
         break;
         case 0:
             return 0;

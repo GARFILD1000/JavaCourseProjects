@@ -1,30 +1,23 @@
 package com.example;
-class Calls{
+class Calls extends AnyCall{
   private String a;
   private String b;
-  private int time; 
   public void setA(String newA){
-    a = newA;
-    
+      this.a = newA;
   };
   public String getA(){
-    return a;
-  
+      return this.a;
   };
   public void setB(String newB){
-    b = newB;
-  
+      this.b = newB;
   };
   public String getB(){
-    return b;
-  
+      return this.b;
   };
   public void setTime(int newTime){
-    time = newTime;
-  
+      this.time = newTime;
   };
   public int getTime(){
-    return time;
-  
+      return this.time;
   };
 }
