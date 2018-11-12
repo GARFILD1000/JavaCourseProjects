@@ -1,9 +1,9 @@
 //import User;
 package com.example.phoneBook;
-class LegalPerson extends User{
+public class LegalPerson extends User{
     private String INN;
     public static int index = 0;
-    LegalPerson(String fio, String phone, String address, String INN){
+    public LegalPerson(String fio, String phone, String address, String INN){
         super(fio, phone, address);
         this.INN = INN;
         index++;

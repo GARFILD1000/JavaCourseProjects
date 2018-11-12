@@ -1,9 +1,9 @@
 //import User;
 package com.example.phoneBook;
-class PhysicalPerson extends User{
+public class PhysicalPerson extends User{
     private String mobilePhone;
     public static int index = 0;
-    PhysicalPerson(String fio, String phone, String address, String mobilePhone){
+    public PhysicalPerson(String fio, String phone, String address, String mobilePhone){
         super(fio, phone, address);
         this.mobilePhone = mobilePhone;
         index++;

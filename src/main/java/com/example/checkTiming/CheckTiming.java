@@ -1,8 +1,8 @@
-package com.example.phoneBook;
-//import LegalPerson;
+package com.example.checkTiming;
 import java.util.Scanner;
 import java.util.*;
 import java.lang.Math;
+import com.example.phoneBook.LegalPerson;
 
 
 class CheckTiming{
