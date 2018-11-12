@@ -1,5 +1,5 @@
 //import User;
-package com.example;
+package com.example.phoneBook;
 class PhysicalPerson extends User{
     private String mobilePhone;
     public static int index = 0;

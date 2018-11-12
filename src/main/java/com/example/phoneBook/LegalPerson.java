@@ -1,5 +1,5 @@
 //import User;
-package com.example;
+package com.example.phoneBook;
 class LegalPerson extends User{
     private String INN;
     public static int index = 0;

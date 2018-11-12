@@ -1,7 +1,11 @@
-package com.example;
+package com.example.phoneBook;
 
 class Conf extends AnyCall{
   private String[] users;
+  public Conf(String[] newUsers, int newTime){
+      this.users = newUsers;
+      this.time = newTime;
+  }
   public void setUsers(String[] newUsers){
       this.users = newUsers;
   };
@@ -14,4 +18,12 @@ class Conf extends AnyCall{
   public int getTime(){
       return this.time;
   };
+  public boolean isInvolved(String user){
+      for(String x: users){
+          if (user.equals(x)){
+              return true;
+          }
+      }
+      return false;
+  }
 }

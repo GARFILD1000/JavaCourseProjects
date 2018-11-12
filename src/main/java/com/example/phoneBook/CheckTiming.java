@@ -1,4 +1,4 @@
-package com.example;
+package com.example.phoneBook;
 //import LegalPerson;
 import java.util.Scanner;
 import java.util.*;

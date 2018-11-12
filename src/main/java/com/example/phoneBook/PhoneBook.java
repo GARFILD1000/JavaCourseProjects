@@ -1,12 +1,14 @@
-package com.example;
+package com.example.phoneBook;
 import java.util.*;
 import java.io.IOException;
 import java.io.FileReader;
-//import PhysicalPerson;
-//import LegalPerson;
 
 class PhoneBook{
     static Scanner input;
+    static Statistic<Call> statCall;
+    static Statistic<Conf> statConf;
+    static TreeSet<LegalPerson> legalPersonTree;
+    static TreeSet<PhysicalPerson> physicalPersonTree;
     
     static class LegalPersonComparator implements Comparator<LegalPerson>{
         public int compare(LegalPerson paramT1, LegalPerson paramT2) {
@@ -34,17 +36,18 @@ class PhoneBook{
     
     public static void main(String[] args){
         input = new Scanner(System.in);
-        TreeSet<LegalPerson> legalPersonTree = new TreeSet<LegalPerson>(new LegalPersonComparator()); 
-        TreeSet<PhysicalPerson> physicalPersonTree = new TreeSet<PhysicalPerson>(new PhysicalPersonComparator());
+        statCall = new Statistic<Call>();
+        statConf = new Statistic<Conf>();
+        legalPersonTree = new TreeSet<LegalPerson>(new LegalPersonComparator()); 
+        physicalPersonTree = new TreeSet<PhysicalPerson>(new PhysicalPersonComparator());
         legalPersonTree.add(new LegalPerson("Bulgakov Dmitriy Olegovich","3506800","Pushkina-Kolotushkina","1435236257"));
         physicalPersonTree.add(new PhysicalPerson("Teslenok Roman Konstantinovich","3502100","Petrovskaya-Rasumovskaya","88005553535"));
         while(true){
-            if (mainCycle(legalPersonTree, physicalPersonTree) <= 0) break;
+            if (mainCycle() <= 0) break;
         }
     }
 
-    
-    public static <E> String readDatabase(String fileName){
+    public static String readDatabase(String fileName){
         clearConsole();
         FileReader fr;
         StringBuffer stringBuffer = new StringBuffer("");
@@ -62,11 +65,11 @@ class PhoneBook{
         catch(IOException error){
             String exception = error.getMessage();
             System.out.println("Error reading from" + fileName + "\n" + exception);
-        };
+        }
         return stringBuffer.toString();
     }
 
-    public static void printAllPersons(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+    public static void printAllPersons(){
         clearConsole();
         System.out.println("<><><> Legal Persons: <><><>");
         if (legalPersonTree.isEmpty()){
@@ -77,7 +80,6 @@ class PhoneBook{
             System.out.println("");
         }
         System.out.println("");
-        
         System.out.println("<><><> Physical Persons: <><><>");
         if (physicalPersonTree.isEmpty()){
             System.out.println("Empty.");
@@ -86,15 +88,13 @@ class PhoneBook{
             printPerson(x);
             System.out.println("");
         }
-        
         input.nextLine();
     }
     
-    public static int deleteAnyPerson(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+    public static int deleteAnyPerson(){
         clearConsole();
         System.out.println("Is person to delete Legal or Physical? (input L or P):");
         String buffer = input.nextLine();
-        
         if (buffer.equals("L") || buffer.equals("l") ){
             System.out.print("Enter FIO: ");
             String FIO = input.nextLine();
@@ -129,10 +129,9 @@ class PhoneBook{
         }
         input.nextLine();
         return 0;
-    };
-    
+    }
 
-    public static int addNewPerson(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+    public static int addNewPerson(){
         clearConsole();
         System.out.println("Is new person Legal or Physical? (input L or P):");
         String buffer = input.nextLine();
@@ -202,7 +201,7 @@ class PhoneBook{
         return 0;
     }
 
-    public static void readAllDatabases(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+    public static void readAllDatabases(){
         String stringFromDatabase = readDatabase("LegalPersons.csv");
         String[] lines = stringFromDatabase.split("\n");
         LegalPerson.clear();
@@ -224,32 +223,66 @@ class PhoneBook{
         input.nextLine();
         return;
     }
-
-    public static int mainCycle(TreeSet<LegalPerson> legalPersonTree, TreeSet<PhysicalPerson> physicalPersonTree){
+    
+    private static void addNewCall(){
         clearConsole();
-        System.out.println("<><><> Phone Book Menu <><><>");
-        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n0. Exit program");
-        System.out.print("Enter menu item number: ");
-        String buffer = input.nextLine();
-        switch(Integer.parseInt(buffer)){
-        case 1: 
-            printAllPersons(legalPersonTree, physicalPersonTree);
-        break; 
-        case 2:
-            addNewPerson(legalPersonTree, physicalPersonTree);
-        break;
-        case 3:   
-            deleteAnyPerson(legalPersonTree, physicalPersonTree);
-        break;
-        case 4:
-            readAllDatabases(legalPersonTree, physicalPersonTree);
-        break;
-        case 0:
-            return 0;
-        default:
-            return -1;
+        System.out.println("Is call? (input y or n)");
+        if (input.nextLine().equals("y")){
+            System.out.print("User A: ");
+            String userA = input.nextLine();
+            System.out.print("User B: ");
+            String userB = input.nextLine();
+            System.out.print("Time: ");
+            int time = input.nextInt();
+            Call newCall = new Call(userA, userB, time); 
+            statCall.addCall(newCall);
         }
-        return 5; 
+        else{
+            System.out.println("Is conference? (input y or n)");
+            if (input.nextLine().equals("y")){
+                ArrayList<String> users = new ArrayList<String>();
+                System.out.print("User " + users.size() + " : ");
+                String name = input.nextLine();
+                while(name.length() > 0){
+                    users.add(name);
+                    System.out.print("User " + users.size() + " : ");
+                    name = input.nextLine();
+                }
+                if (users.size() > 2){
+                    
+                    String[] stringUsers = users.toArray(new String[0]);
+                    System.out.print("Time: ");
+                    int time = input.nextInt();
+                    Conf newConf = new Conf(stringUsers, time);
+                    statConf.addCall(newConf);
+                }
+                else{
+                    System.out.print("It's not conference! Try to add into calls.");
+                }
+            }
+        }
+        input.nextLine();
+    }
+    
+    private static void printStatistic(){
+        clearConsole();
+        System.out.println("<><><> Calls: <><><>");
+        System.out.println("All time: " + statCall.allTime() + " seconds");
+        Call maxCall = statCall.getMax();
+        if (maxCall != null){
+            System.out.println("The longest call: " + maxCall.getTime() + " seconds" + " ( " + maxCall.getA() + " -> " + maxCall.getB() + " )");
+        }
+        System.out.println("<><><> Conferences: <><><>");
+        System.out.println("All time: " + statConf.allTime() + " seconds");
+        Conf maxConf = statConf.getMax();    
+        if (maxConf != null){
+            System.out.print("The longest conference: " + maxConf.getTime() + " seconds ( Members: ");
+            for (String x: maxConf.getUsers()){
+                System.out.print(x + ", ");
+            }
+            System.out.println(" )");
+        }
+        input.nextLine();
     } 
     
     private static void printPerson(LegalPerson person){
@@ -270,5 +303,39 @@ class PhoneBook{
             e.printStackTrace();
         }
     }
+    
+    public static int mainCycle(){
+        clearConsole();
+        System.out.println("<><><> Phone Book Menu <><><>");
+        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n5. Print Statistic\n6. Add new Call\n0. Exit program");
+        System.out.print("Enter menu item number: ");
+        String buffer = input.nextLine();
+        switch(Integer.parseInt(buffer)){
+        case 1: 
+            printAllPersons();
+        break; 
+        case 2:
+            addNewPerson();
+        break;
+        case 3:   
+            deleteAnyPerson();
+        break;
+        case 4:
+            readAllDatabases();
+        break;
+        case 5:
+            printStatistic();
+        break;
+        case 6:
+            addNewCall();
+         break;
+        case 0:
+            return 0;
+        default:
+            return -1;
+        }
+        return 5; 
+    } 
+    
 }
 
