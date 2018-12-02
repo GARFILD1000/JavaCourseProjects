@@ -2,9 +2,11 @@ package com.example.phoneBook;
 import java.util.*;
 import java.io.IOException;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 class PhoneBook{
     static Scanner input;
+    static Scanner fileReader;
     static Statistic<Call> statCall;
     static Statistic<Conf> statConf;
     static TreeSet<LegalPerson> legalPersonTree;
@@ -42,31 +44,12 @@ class PhoneBook{
         physicalPersonTree = new TreeSet<PhysicalPerson>(new PhysicalPersonComparator());
         legalPersonTree.add(new LegalPerson("Bulgakov Dmitriy Olegovich","3506800","Pushkina-Kolotushkina","1435236257"));
         physicalPersonTree.add(new PhysicalPerson("Teslenok Roman Konstantinovich","3502100","Petrovskaya-Rasumovskaya","88005553535"));
+        statCall.add(new Call("Dmitriy","Roman",44));
+        String[] users = {"Andrey", "Roman", "Dmitriy"};
+        statConf.add(new Conf(users,100));
         while(true){
             if (mainCycle() <= 0) break;
         }
-    }
-
-    public static String readDatabase(String fileName){
-        clearConsole();
-        FileReader fr;
-        StringBuffer stringBuffer = new StringBuffer("");
-        try{
-            fr = new FileReader(fileName);
-            char[] buffer = new char[3];
-            int result = fr.read(buffer, 0, 3);
-            while(result > 0){
-                stringBuffer = stringBuffer.append(String.valueOf(buffer));
-                result = fr.read(buffer, 0, 3);
-            }
-            System.out.println("Readed from " + fileName + "\n" + stringBuffer);
-            fr.close();
-        }
-        catch(IOException error){
-            String exception = error.getMessage();
-            System.out.println("Error reading from" + fileName + "\n" + exception);
-        }
-        return stringBuffer.toString();
     }
 
     public static void printAllPersons(){
@@ -201,24 +184,120 @@ class PhoneBook{
         return 0;
     }
 
+
+    public static String readDatabase(String fileName){
+        FileReader fr;
+        StringBuffer stringBuffer = new StringBuffer("");
+        try{
+            fr = new FileReader(fileName);
+            char[] buffer = new char[3];
+            int result = fr.read(buffer, 0, 3);
+            while(result > 0){
+                stringBuffer = stringBuffer.append(String.valueOf(buffer));
+                result = fr.read(buffer, 0, 3);
+            }
+            System.out.println("Readed from " + fileName + "\n" + stringBuffer);
+            fr.close();
+        }
+        catch(IOException error){
+            String exception = error.getMessage();
+            System.out.println("Error reading from" + fileName + "\n" + exception);
+        }
+        return stringBuffer.toString();
+    }
+
+    
+    public static void writeDatabase(String fileName, String[] data){
+        FileWriter fw;
+        try{
+            fw = new FileWriter(fileName);
+            for(String person: data){
+                fw.write(person);
+                fw.write("\n");
+                System.out.println("Writed to " + fileName + "\n" + person);
+            }
+            
+            fw.close();
+        }
+        catch(IOException error){
+            String exception = error.getMessage();
+            System.out.println("Error writing to " + fileName + "\n" + exception);
+        }
+    }
+    
+    public static void writeAllDatabases(){
+        clearConsole(); 
+               
+        String[] data = new String[legalPersonTree.size()];
+        int iterator = 0;
+        for (LegalPerson x: legalPersonTree){
+            data[iterator] = x.toCSV();
+            iterator++;
+        }
+        writeDatabase("LegalPersons.csv", data);
+        
+        data = new String[physicalPersonTree.size()];
+        iterator = 0;
+        for (PhysicalPerson x: physicalPersonTree){
+            data[iterator] = x.toCSV();
+            iterator++;
+        }
+        writeDatabase("PhysicalPersons.csv", data);
+        
+        data = statCall.toCSV();
+        writeDatabase("Calls.csv", data);
+        
+        data = statConf.toCSV();
+        writeDatabase("Conferences.csv", data);
+        
+        input.nextLine();
+        return;
+    }
+
+
     public static void readAllDatabases(){
+        clearConsole();
         String stringFromDatabase = readDatabase("LegalPersons.csv");
         String[] lines = stringFromDatabase.split("\n");
         LegalPerson.clear();
         legalPersonTree.clear();
         for(String x: lines){
             LegalPerson newLegalPerson = new LegalPerson("","","","");
-            newLegalPerson.fromCSV(x);
-            legalPersonTree.add(newLegalPerson);
+            if (newLegalPerson.fromCSV(x) == 0){
+                legalPersonTree.add(newLegalPerson);
+            }
         }
+        
         stringFromDatabase = readDatabase("PhysicalPersons.csv");
         lines = stringFromDatabase.split("\n");
         PhysicalPerson.clear();
         physicalPersonTree.clear();
         for(String x: lines){
             PhysicalPerson newPhysicalPerson = new PhysicalPerson("","","","");
-            newPhysicalPerson.fromCSV(x);
-            physicalPersonTree.add(newPhysicalPerson);
+            if (newPhysicalPerson.fromCSV(x) == 0){
+                physicalPersonTree.add(newPhysicalPerson);
+            }
+        }
+        
+        stringFromDatabase = readDatabase("Calls.csv");
+        lines = stringFromDatabase.split("\n");
+        statCall.clear();
+        for(String x: lines){
+            Call newCall = new Call("","",0);
+            if (newCall.fromCSV(x) == 0){
+                statCall.add(newCall);
+            }
+        }
+        
+        stringFromDatabase = readDatabase("Conferences.csv");
+        lines = stringFromDatabase.split("\n");
+        statConf.clear();
+        for(String x: lines){
+            String[] stringUsersArray = new String[0];
+            Conf newConf = new Conf(stringUsersArray,0);
+            if (newConf.fromCSV(x) == 0){
+                statConf.add(newConf);
+            }
         }
         input.nextLine();
         return;
@@ -235,7 +314,7 @@ class PhoneBook{
             System.out.print("Time: ");
             int time = input.nextInt();
             Call newCall = new Call(userA, userB, time); 
-            statCall.addCall(newCall);
+            statCall.add(newCall);
         }
         else{
             System.out.println("Is conference? (input y or n)");
@@ -254,7 +333,7 @@ class PhoneBook{
                     System.out.print("Time: ");
                     int time = input.nextInt();
                     Conf newConf = new Conf(stringUsers, time);
-                    statConf.addCall(newConf);
+                    statConf.add(newConf);
                 }
                 else{
                     System.out.print("It's not conference! Try to add into calls.");
@@ -307,7 +386,7 @@ class PhoneBook{
     public static int mainCycle(){
         clearConsole();
         System.out.println("<><><> Phone Book Menu <><><>");
-        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n5. Print Statistic\n6. Add new Call\n0. Exit program");
+        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n5. Write Database\n6. Print Statistic\n7. Add new Call\n0. Exit program");
         System.out.print("Enter menu item number: ");
         String buffer = input.nextLine();
         switch(Integer.parseInt(buffer)){
@@ -324,9 +403,12 @@ class PhoneBook{
             readAllDatabases();
         break;
         case 5:
-            printStatistic();
+            writeAllDatabases();
         break;
         case 6:
+            printStatistic();
+        break;
+        case 7:
             addNewCall();
          break;
         case 0:

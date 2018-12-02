@@ -1,8 +1,4 @@
 package com.example.phoneBook;
-interface CSV{
-    String toCSV();
-    int fromCSV(String str);
-}
 
 abstract class User implements CSV{
     protected User(String newFio, String newPhone, String newAddress){
@@ -42,7 +38,7 @@ abstract class User implements CSV{
     
     public String toCSV(){
         return (ID + ";" + fio + ";" + phone + ";" + address);
-    };
+    }
     public int fromCSV(String str){
         String[] array = str.split(";");
         if (array.length >= 4){
