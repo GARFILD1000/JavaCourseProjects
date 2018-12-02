@@ -11,32 +11,39 @@ class PhoneBook{
     static Statistic<Conf> statConf;
     static TreeSet<LegalPerson> legalPersonTree;
     static TreeSet<PhysicalPerson> physicalPersonTree;
+    static DatabaseSQL databaseSQL;
     
     static class LegalPersonComparator implements Comparator<LegalPerson>{
         public int compare(LegalPerson paramT1, LegalPerson paramT2) {
-            if (paramT1.getID() > paramT2.getID()){
+            if (paramT1.getFio().compareTo(paramT2.getFio()) > 0){
                 return 1;
             }
-            else if (paramT1.getID() < paramT2.getID())
+            else if (paramT1.getFio().compareTo(paramT2.getFio()) < 0){
                 return -1;
-            else
+            }
+            else{
                 return 0;
+            }
         }
     }
-    
     static class PhysicalPersonComparator implements Comparator<PhysicalPerson> {
         public int compare(PhysicalPerson paramT1, PhysicalPerson paramT2) {
-            if (paramT1.getID() > paramT2.getID()){
+            if (paramT1.getFio().compareTo(paramT2.getFio()) > 0){
                 return 1;
             }
-            else if (paramT1.getID() < paramT2.getID())
+            else if (paramT1.getFio().compareTo(paramT2.getFio()) < 0){
                 return -1;
-            else
+            }
+            else{
                 return 0;
+            }
         }
     }
     
     public static void main(String[] args){
+        databaseSQL = new DatabaseSQL("phoneBook");
+        databaseSQL.connect();
+        databaseSQL.executeQuery("SELECT * FROM legalPersons");
         input = new Scanner(System.in);
         statCall = new Statistic<Call>();
         statConf = new Statistic<Conf>();
@@ -184,72 +191,26 @@ class PhoneBook{
         return 0;
     }
 
-
-    public static String readDatabase(String fileName){
-        FileReader fr;
-        StringBuffer stringBuffer = new StringBuffer("");
-        try{
-            fr = new FileReader(fileName);
-            char[] buffer = new char[3];
-            int result = fr.read(buffer, 0, 3);
-            while(result > 0){
-                stringBuffer = stringBuffer.append(String.valueOf(buffer));
-                result = fr.read(buffer, 0, 3);
-            }
-            System.out.println("Readed from " + fileName + "\n" + stringBuffer);
-            fr.close();
-        }
-        catch(IOException error){
-            String exception = error.getMessage();
-            System.out.println("Error reading from" + fileName + "\n" + exception);
-        }
-        return stringBuffer.toString();
-    }
-
-    
-    public static void writeDatabase(String fileName, String[] data){
-        FileWriter fw;
-        try{
-            fw = new FileWriter(fileName);
-            for(String person: data){
-                fw.write(person);
-                fw.write("\n");
-                System.out.println("Writed to " + fileName + "\n" + person);
-            }
-            
-            fw.close();
-        }
-        catch(IOException error){
-            String exception = error.getMessage();
-            System.out.println("Error writing to " + fileName + "\n" + exception);
-        }
-    }
-    
     public static void writeAllDatabases(){
         clearConsole(); 
-               
         String[] data = new String[legalPersonTree.size()];
         int iterator = 0;
         for (LegalPerson x: legalPersonTree){
             data[iterator] = x.toCSV();
             iterator++;
         }
-        writeDatabase("LegalPersons.csv", data);
-        
+        DatabaseCSV.write("LegalPersons.csv", data);
         data = new String[physicalPersonTree.size()];
         iterator = 0;
         for (PhysicalPerson x: physicalPersonTree){
             data[iterator] = x.toCSV();
             iterator++;
         }
-        writeDatabase("PhysicalPersons.csv", data);
-        
+        DatabaseCSV.write("PhysicalPersons.csv", data);
         data = statCall.toCSV();
-        writeDatabase("Calls.csv", data);
-        
+        DatabaseCSV.write("Calls.csv", data);
         data = statConf.toCSV();
-        writeDatabase("Conferences.csv", data);
-        
+        DatabaseCSV.write("Conferences.csv", data);
         input.nextLine();
         return;
     }
@@ -257,7 +218,7 @@ class PhoneBook{
 
     public static void readAllDatabases(){
         clearConsole();
-        String stringFromDatabase = readDatabase("LegalPersons.csv");
+        String stringFromDatabase = DatabaseCSV.read("LegalPersons.csv");
         String[] lines = stringFromDatabase.split("\n");
         LegalPerson.clear();
         legalPersonTree.clear();
@@ -266,9 +227,11 @@ class PhoneBook{
             if (newLegalPerson.fromCSV(x) == 0){
                 legalPersonTree.add(newLegalPerson);
             }
+            else {
+                newLegalPerson.clear();
+            }
         }
-        
-        stringFromDatabase = readDatabase("PhysicalPersons.csv");
+        stringFromDatabase = DatabaseCSV.read("PhysicalPersons.csv");
         lines = stringFromDatabase.split("\n");
         PhysicalPerson.clear();
         physicalPersonTree.clear();
@@ -277,9 +240,11 @@ class PhoneBook{
             if (newPhysicalPerson.fromCSV(x) == 0){
                 physicalPersonTree.add(newPhysicalPerson);
             }
+            else {
+                newPhysicalPerson.clear();
+            }
         }
-        
-        stringFromDatabase = readDatabase("Calls.csv");
+        stringFromDatabase = DatabaseCSV.read("Calls.csv");
         lines = stringFromDatabase.split("\n");
         statCall.clear();
         for(String x: lines){
@@ -288,13 +253,11 @@ class PhoneBook{
                 statCall.add(newCall);
             }
         }
-        
-        stringFromDatabase = readDatabase("Conferences.csv");
+        stringFromDatabase = DatabaseCSV.read("Conferences.csv");
         lines = stringFromDatabase.split("\n");
         statConf.clear();
         for(String x: lines){
-            String[] stringUsersArray = new String[0];
-            Conf newConf = new Conf(stringUsersArray,0);
+            Conf newConf = new Conf(new String[0],0);
             if (newConf.fromCSV(x) == 0){
                 statConf.add(newConf);
             }
