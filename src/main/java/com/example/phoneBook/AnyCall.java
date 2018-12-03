@@ -20,5 +20,9 @@ abstract class AnyCall implements CSV{
         }
         return 0;
     }
+    public String toSQL(){
+        return ("'" + ID + "','" + time + "'");
+    }
+    
     
 };

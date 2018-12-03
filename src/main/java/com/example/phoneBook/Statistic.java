@@ -62,6 +62,16 @@ class Statistic <T extends AnyCall>{
         }
         return data;
     }
+    
+    public String[] toSQL(){
+        String[] data = new String[this.size()];
+        int iterator = 0;
+        for (T x: this.lst){
+            data[iterator] = x.toCSV();
+            iterator++;
+        }
+        return data;
+    }
    
 }
 

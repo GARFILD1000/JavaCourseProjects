@@ -49,7 +49,7 @@ class Conf extends AnyCall{
         }
         stringUsers.deleteCharAt(stringUsers.lastIndexOf("-"));
         return super.toCSV() + ";" + stringUsers.toString();
-    }
+  }
     
     public int fromCSV(String str){
         String[] array = str.split(";");
@@ -63,5 +63,15 @@ class Conf extends AnyCall{
             return 1;
         }
         return 0;
+    }
+    
+    public String toSQL(){
+        StringBuffer stringUsers = new StringBuffer("");
+        for (String x: users){
+            stringUsers.append(x);
+            stringUsers.append("-");
+        }
+        stringUsers.deleteCharAt(stringUsers.lastIndexOf("-"));
+        return super.toSQL() + "','" + stringUsers.toString() + "'";
     }
 }

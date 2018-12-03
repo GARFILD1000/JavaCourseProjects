@@ -16,6 +16,7 @@ class DatabaseSQL{
     public boolean connected;
     private Connection con;
     private Statement st;
+    private ResultSet rs;
     
     public DatabaseSQL(String newDatabaseName){
         driverName = "jdbc:mysql";
@@ -26,42 +27,90 @@ class DatabaseSQL{
         st = null;
     }
     
-    public void connect(){ 
+    public ArrayList<String> executeQuery(String query, ArrayList<String> fields){ 
+        this.connected = false;
         String URL = driverName + "://" + hostName + ":" + portNumber + "/" + databaseName;  
+        ArrayList<String> result = new ArrayList<String>();
+        StringBuilder queryResult = new StringBuilder();
         try{
             con = DriverManager.getConnection(URL, usr, psw);
             st = con.createStatement();
             if (con != null){
                 this.connected = true;
             }
-        }
-        catch(SQLException e){
-           e.printStackTrace();
-        }
-    }
-    
-    public void close(){
-        this.connected = false;
-        try{
-            con.close();
-        }
-        catch(SQLException e){
-           e.printStackTrace();
-        }
-    }
-    
-    public void executeQuery(String query){
-        try{
-            ResultSet rs = st.executeQuery(query);
+            rs = st.executeQuery(query);
+            int counter = 0;
             while(rs.next()){
-                String result = rs.getString("fio");
-                System.out.println(result);
+                queryResult = new StringBuilder();
+                for (int i = 0; i < fields.size(); i++){
+                    queryResult.append(rs.getString(fields.get(i)));
+                    if (i < fields.size()-1){
+                        queryResult.append(";");
+                    }
+                }
+                result.add(queryResult.toString());
+                counter++;
             }
         }
         catch(SQLException e){
            e.printStackTrace();
         }
+        finally {
+            try { 
+                con.close(); 
+            } 
+            catch(SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                st.close(); 
+            } 
+            catch(SQLException e) { 
+                e.printStackTrace();
+            }
+            try { 
+                rs.close(); 
+            } 
+            catch(SQLException e) { 
+                e.printStackTrace();
+            }
+            
+        }
+        return result;
     }
+    
+    public void executeUpdate(String query){ 
+        this.connected = false;
+        String URL = driverName + "://" + hostName + ":" + portNumber + "/" + databaseName;  
+        ArrayList<String> result = new ArrayList<String>();
+        StringBuilder queryResult = new StringBuilder();
+        try{
+            con = DriverManager.getConnection(URL, usr, psw);
+            st = con.createStatement();
+            if (con != null){
+                this.connected = true;
+            }
+            st.executeUpdate(query);
+        }
+        catch(SQLException e){
+           e.printStackTrace();
+        }
+        finally {
+            try { 
+                con.close(); 
+            } 
+            catch(SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                st.close(); 
+            } 
+            catch(SQLException e) { 
+                e.printStackTrace();
+            }
+        }
+    }
+    
 
 
 

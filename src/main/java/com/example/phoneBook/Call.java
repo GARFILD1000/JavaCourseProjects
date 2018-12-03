@@ -69,5 +69,12 @@ class Call extends AnyCall{
         }
         return 0;
     }
-  
+    
+    public String toSQL(){
+        StringBuffer stringUsers = new StringBuffer("");
+        stringUsers.append(this.a);
+        stringUsers.append("-");
+        stringUsers.append(this.b);
+        return (super.toSQL() + ",'" + stringUsers.toString() + "'");
+    }
 }

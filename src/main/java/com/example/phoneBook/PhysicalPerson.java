@@ -32,5 +32,9 @@ public class PhysicalPerson extends User{
         else return 1;
         return 0;
     }
+    
+    public String toSQL(){
+        return super.toSQL() + ",'" + mobilePhone + "'";
+    }
 }
 

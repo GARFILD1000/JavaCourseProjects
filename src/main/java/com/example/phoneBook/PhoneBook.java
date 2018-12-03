@@ -41,9 +41,15 @@ class PhoneBook{
     }
     
     public static void main(String[] args){
-        databaseSQL = new DatabaseSQL("phoneBook");
-        databaseSQL.connect();
-        databaseSQL.executeQuery("SELECT * FROM legalPersons");
+            databaseSQL = new DatabaseSQL("phoneBook");
+        ArrayList<String> resultFields = new ArrayList<String>(Arrays.asList("id","fio","phone","address","inn"));
+        databaseSQL.executeUpdate("INSERT INTO legalPersons VALUES(0,'Someone new', '8121323433', 'Random 21', '221534231')");
+        ArrayList<String> list = databaseSQL.executeQuery("SELECT * FROM legalPersons", resultFields);
+        
+        for (String x: list){
+            System.out.println(x);
+        }
+        
         input = new Scanner(System.in);
         statCall = new Statistic<Call>();
         statConf = new Statistic<Conf>();
@@ -191,7 +197,84 @@ class PhoneBook{
         return 0;
     }
 
-    public static void writeAllDatabases(){
+public static void writeDatabasesSQL(){
+        clearConsole(); 
+        databaseSQL = new DatabaseSQL("phoneBook");
+        for (LegalPerson x: legalPersonTree){
+            databaseSQL.executeUpdate("INSERT INTO legalPersons VALUES(" + x.toSQL() + ")");
+        }
+        for (PhysicalPerson x: physicalPersonTree){
+            databaseSQL.executeUpdate("INSERT INTO physicalPersons VALUES(" + x.toSQL() + ")");
+        }
+        String[] data = statCall.toSQL();
+        for (String x: data){
+            databaseSQL.executeUpdate("INSERT INTO calls VALUES(" + x + ")");
+        }
+        data = statConf.toSQL();
+        for (String x: data){
+            databaseSQL.executeUpdate("INSERT INTO conferences VALUES(" + x + ")");
+        }
+        input.nextLine();
+        return;
+    }
+
+
+    public static void readDatabasesSQL(){
+        clearConsole();
+        
+        databaseSQL = new DatabaseSQL("phoneBook");
+        ArrayList<String> resultFields = new ArrayList<String>(Arrays.asList("id","fio","phone","address","inn"));
+        ArrayList<String> resultOfQuery = databaseSQL.executeQuery("SELECT * FROM legalPersons", resultFields);
+        LegalPerson.clear();
+        legalPersonTree.clear();
+        for (String x: resultOfQuery){
+            LegalPerson newLegalPerson = new LegalPerson("","","","");
+            if (newLegalPerson.fromCSV(x) == 0){
+                legalPersonTree.add(newLegalPerson);
+            }
+            else {
+                newLegalPerson.clear();
+            }
+        }
+        
+        resultFields = new ArrayList<String>(Arrays.asList("id","fio","phone","address","mobile_phone"));
+        resultOfQuery = databaseSQL.executeQuery("SELECT * FROM physicalPersons", resultFields);
+        PhysicalPerson.clear();
+        physicalPersonTree.clear();
+        for (String x: resultOfQuery){
+            PhysicalPerson newPhysicalPerson = new PhysicalPerson("","","","");
+            if (newPhysicalPerson.fromCSV(x) == 0){
+                physicalPersonTree.add(newPhysicalPerson);
+            }
+            else {
+                newPhysicalPerson.clear();
+            }
+        }
+        
+        resultFields = new ArrayList<String>(Arrays.asList("id","time","participants"));
+        resultOfQuery = databaseSQL.executeQuery("SELECT * FROM calls", resultFields);
+        statCall.clear();
+        for(String x: resultOfQuery){
+            Call newCall = new Call("","",0);
+            if (newCall.fromCSV(x) == 0){
+                statCall.add(newCall);
+            }
+        }
+        
+        resultFields = new ArrayList<String>(Arrays.asList("id","time","participants"));
+        resultOfQuery = databaseSQL.executeQuery("SELECT * FROM calls", resultFields);
+        statConf.clear();
+        for(String x: resultOfQuery){
+            Conf newConf = new Conf(new String[0],0);
+            if (newConf.fromCSV(x) == 0){
+                statConf.add(newConf);
+            }
+        }
+        input.nextLine();
+        return;
+    }
+
+    public static void writeDatabasesCSV(){
         clearConsole(); 
         String[] data = new String[legalPersonTree.size()];
         int iterator = 0;
@@ -216,7 +299,7 @@ class PhoneBook{
     }
 
 
-    public static void readAllDatabases(){
+    public static void readDatabasesCSV(){
         clearConsole();
         String stringFromDatabase = DatabaseCSV.read("LegalPersons.csv");
         String[] lines = stringFromDatabase.split("\n");
@@ -349,7 +432,7 @@ class PhoneBook{
     public static int mainCycle(){
         clearConsole();
         System.out.println("<><><> Phone Book Menu <><><>");
-        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read Database\n5. Write Database\n6. Print Statistic\n7. Add new Call\n0. Exit program");
+        System.out.println("1. Print all persons\n2. Add new person\n3. Delete any person\n4. Read CSV Database\n5. Write CSV Database\n6. Read SQL Database\n7. Write SQL Database\n8. Print Statistic\n9. Add new Call\n0. Exit program");
         System.out.print("Enter menu item number: ");
         String buffer = input.nextLine();
         switch(Integer.parseInt(buffer)){
@@ -363,15 +446,21 @@ class PhoneBook{
             deleteAnyPerson();
         break;
         case 4:
-            readAllDatabases();
+            readDatabasesCSV();
         break;
         case 5:
-            writeAllDatabases();
+            writeDatabasesCSV();
         break;
         case 6:
-            printStatistic();
+            readDatabasesSQL();
         break;
         case 7:
+            writeDatabasesSQL();
+        break;
+        case 8:
+            printStatistic();
+        break;
+        case 9:
             addNewCall();
          break;
         case 0:

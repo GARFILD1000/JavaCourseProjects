@@ -36,5 +36,9 @@ public class LegalPerson extends User{
         }
         return 0;
     }
+    
+    public String toSQL(){
+        return super.toSQL() + ",'" + INN + "'";
+    }
 
 }

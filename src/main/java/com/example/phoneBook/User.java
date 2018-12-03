@@ -39,6 +39,7 @@ abstract class User implements CSV{
     public String toCSV(){
         return (ID + ";" + fio + ";" + phone + ";" + address);
     }
+    
     public int fromCSV(String str){
         String[] array = str.split(";");
         if (array.length >= 4){
@@ -55,5 +56,8 @@ abstract class User implements CSV{
         return 0;
     }
     
+    public String toSQL(){
+        return (ID + ",'" + fio + "','" + phone + "','" + address + "'");
+    }
 }
 
