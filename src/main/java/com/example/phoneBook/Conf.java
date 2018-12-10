@@ -72,6 +72,6 @@ class Conf extends AnyCall{
             stringUsers.append("-");
         }
         stringUsers.deleteCharAt(stringUsers.lastIndexOf("-"));
-        return super.toSQL() + "','" + stringUsers.toString() + "'";
+        return super.toSQL() + ",'" + stringUsers.toString() + "'";
     }
 }

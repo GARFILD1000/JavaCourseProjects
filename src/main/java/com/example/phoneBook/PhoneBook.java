@@ -200,17 +200,21 @@ class PhoneBook{
 public static void writeDatabasesSQL(){
         clearConsole(); 
         databaseSQL = new DatabaseSQL("phoneBook");
+        databaseSQL.executeUpdate("DELETE FROM legalPersons");
         for (LegalPerson x: legalPersonTree){
             databaseSQL.executeUpdate("INSERT INTO legalPersons VALUES(" + x.toSQL() + ")");
         }
+        databaseSQL.executeUpdate("DELETE FROM physicalPersons");
         for (PhysicalPerson x: physicalPersonTree){
             databaseSQL.executeUpdate("INSERT INTO physicalPersons VALUES(" + x.toSQL() + ")");
         }
         String[] data = statCall.toSQL();
+        databaseSQL.executeUpdate("DELETE FROM calls");
         for (String x: data){
             databaseSQL.executeUpdate("INSERT INTO calls VALUES(" + x + ")");
         }
         data = statConf.toSQL();
+        databaseSQL.executeUpdate("DELETE FROM conferences");
         for (String x: data){
             databaseSQL.executeUpdate("INSERT INTO conferences VALUES(" + x + ")");
         }
@@ -262,7 +266,7 @@ public static void writeDatabasesSQL(){
         }
         
         resultFields = new ArrayList<String>(Arrays.asList("id","time","participants"));
-        resultOfQuery = databaseSQL.executeQuery("SELECT * FROM calls", resultFields);
+        resultOfQuery = databaseSQL.executeQuery("SELECT * FROM conferences", resultFields);
         statConf.clear();
         for(String x: resultOfQuery){
             Conf newConf = new Conf(new String[0],0);
